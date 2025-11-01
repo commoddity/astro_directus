@@ -1,0 +1,91 @@
+services:
+  # Astro Dev Server
+  astro:
+    image: node:20-alpine
+    container_name: astro
+    working_dir: /app
+    command: sh -c "yarn install && yarn dev --host"
+    ports:
+      - "4321:4321"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.yarn
+    networks:
+      - app-network
+    environment:
+      - PUBLIC_DIRECTUS_URL=http://directus:8055
+    depends_on:
+      - directus
+
+  # Directus CMS
+  directus:
+    image: directus/directus:latest
+    container_name: directus
+    restart: unless-stopped
+    ports:
+      - "8055:8055"
+    volumes:
+      - ./tmp/uploads:/directus/uploads
+    networks:
+      - app-network
+    env_file:
+      - .env
+    environment:
+      KEY: ${KEY}
+      SECRET: ${SECRET}
+      
+      # Admin User
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      
+      # Database
+      DB_CLIENT: pg
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE:-directus}
+      DB_USER: ${DB_USER:-directus}
+      DB_PASSWORD: ${DB_PASSWORD:-directus}
+      
+      # Directus Configuration
+      PUBLIC_URL: ${PUBLIC_DIRECTUS_URL:-http://localhost:8055}
+      WEBSOCKETS_ENABLED: true
+      
+      # CORS Configuration
+      CORS_ENABLED: true
+      CORS_ORIGIN: true
+      
+      # File Storage
+      STORAGE_LOCATIONS: local
+      STORAGE_LOCAL_ROOT: /directus/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:18-alpine
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER:-directus}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-directus}
+      POSTGRES_DB: ${DB_DATABASE:-directus}
+    volumes:
+      - ./tmp/data:/var/lib/postgresql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-directus} -d ${DB_DATABASE:-directus}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  app-network:
+    name: astro-directus-network
+
+
+

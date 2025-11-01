@@ -1,0 +1,125 @@
+---
+// TODO: Format this page for PDF document appearance
+// - Add proper page breaks and margins for print layout
+// - Implement PDF-specific styling (e.g., page size, orientation)
+// - Consider using CSS @page rules for print formatting
+// - Add table of contents generation for multi-page PDFs
+// - Ensure fonts and colors are PDF-compatible
+
+import { getChapters } from "../../lib/directus";
+
+const chapters = await getChapters();
+---
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="generator" content={Astro.generator} />
+        <title>Chapters</title>
+        <style>
+            body {
+                font-family:
+                    system-ui,
+                    -apple-system,
+                    sans-serif;
+                line-height: 1.6;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 2rem;
+                color: #333;
+            }
+            h1 {
+                color: #2c3e50;
+                border-bottom: 3px solid #3498db;
+                padding-bottom: 0.5rem;
+            }
+            .chapter-list {
+                list-style: none;
+                padding: 0;
+            }
+            .chapter-item {
+                background: #f8f9fa;
+                margin: 1rem 0;
+                padding: 1.5rem;
+                border-radius: 8px;
+                border-left: 4px solid #3498db;
+                transition:
+                    transform 0.2s,
+                    box-shadow 0.2s;
+            }
+            .chapter-item:hover {
+                transform: translateX(5px);
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+            .chapter-link {
+                text-decoration: none;
+                color: inherit;
+                display: block;
+            }
+            .chapter-number {
+                color: #7f8c8d;
+                font-size: 0.9rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                margin-bottom: 0.5rem;
+            }
+            .chapter-title {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: #2c3e50;
+                margin: 0;
+            }
+            .no-chapters {
+                text-align: center;
+                padding: 3rem;
+                color: #7f8c8d;
+                font-style: italic;
+            }
+            .back-link {
+                display: inline-block;
+                margin-bottom: 2rem;
+                color: #3498db;
+                text-decoration: none;
+                font-weight: 500;
+            }
+            .back-link:hover {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <a href="/" class="back-link">← Back to Home</a>
+
+        <h1>All Chapters</h1>
+
+        {
+            chapters.length === 0 ? (
+                <div class="no-chapters">
+                    <p>No chapters have been published yet.</p>
+                    <p>
+                        Add chapters in the Directus admin panel at{" "}
+                        <a href="http://localhost:8055">localhost:8055</a>
+                    </p>
+                </div>
+            ) : (
+                <ul class="chapter-list">
+                    {chapters.map((chapter) => (
+                        <li class="chapter-item">
+                            <a
+                                href={`/chapters/${chapter.slug}`}
+                                class="chapter-link"
+                            >
+                                <div class="chapter-number">
+                                    Chapter {chapter.order}
+                                </div>
+                                <h2 class="chapter-title">{chapter.title}</h2>
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            )
+        }
+    </body>
+</html>

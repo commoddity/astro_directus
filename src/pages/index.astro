@@ -1,0 +1,219 @@
+---
+// TODO: Format this page for PDF document appearance
+// - Add proper page breaks and margins for print layout
+// - Implement PDF-specific styling (e.g., page size, orientation)
+// - Consider using CSS @page rules for print formatting
+// - Add table of contents generation for multi-page PDFs
+// - Ensure fonts and colors are PDF-compatible
+
+import { getChapters } from "../lib/directus";
+
+const chapters = await getChapters();
+const recentChapters = chapters.slice(0, 3);
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>My Site</title>
+		<style>
+			body {
+				font-family:
+					system-ui,
+					-apple-system,
+					sans-serif;
+				line-height: 1.6;
+				max-width: 1000px;
+				margin: 0 auto;
+				padding: 2rem;
+				color: #333;
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				min-height: 100vh;
+			}
+			.container {
+				background: white;
+				border-radius: 12px;
+				padding: 3rem;
+				box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+			}
+			h1 {
+				color: #2c3e50;
+				font-size: 3rem;
+				margin-bottom: 1rem;
+				text-align: center;
+			}
+			.subtitle {
+				text-align: center;
+				color: #7f8c8d;
+				font-size: 1.2rem;
+				margin-bottom: 3rem;
+			}
+			.section {
+				margin: 2rem 0;
+			}
+			.section-title {
+				color: #2c3e50;
+				border-bottom: 3px solid #3498db;
+				padding-bottom: 0.5rem;
+				margin-bottom: 1.5rem;
+			}
+			.chapter-grid {
+				display: grid;
+				gap: 1.5rem;
+				margin: 2rem 0;
+			}
+			.chapter-card {
+				background: #f8f9fa;
+				padding: 1.5rem;
+				border-radius: 8px;
+				border-left: 4px solid #3498db;
+				transition:
+					transform 0.2s,
+					box-shadow 0.2s;
+			}
+			.chapter-card:hover {
+				transform: translateY(-4px);
+				box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+			}
+			.chapter-link {
+				text-decoration: none;
+				color: inherit;
+				display: block;
+			}
+			.chapter-number {
+				color: #7f8c8d;
+				font-size: 0.85rem;
+				font-weight: 600;
+				text-transform: uppercase;
+				margin-bottom: 0.5rem;
+			}
+			.chapter-title {
+				font-size: 1.3rem;
+				font-weight: 600;
+				color: #2c3e50;
+				margin: 0;
+			}
+			.cta-button {
+				display: inline-block;
+				background: #3498db;
+				color: white;
+				padding: 1rem 2rem;
+				border-radius: 8px;
+				text-decoration: none;
+				font-weight: 600;
+				text-align: center;
+				transition:
+					background 0.2s,
+					transform 0.2s;
+				margin: 1rem auto;
+				display: block;
+				max-width: 300px;
+			}
+			.cta-button:hover {
+				background: #2980b9;
+				transform: translateY(-2px);
+			}
+			.info-box {
+				background: #e8f4f8;
+				border-left: 4px solid #3498db;
+				padding: 1.5rem;
+				border-radius: 8px;
+				margin: 2rem 0;
+			}
+			.info-box h3 {
+				color: #2c3e50;
+				margin-top: 0;
+			}
+			.info-box p {
+				margin: 0.5rem 0;
+				color: #555;
+			}
+			.info-box a {
+				color: #3498db;
+				font-weight: 600;
+			}
+			.no-chapters {
+				text-align: center;
+				padding: 2rem;
+				color: #7f8c8d;
+				font-style: italic;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>My Site</h1>
+			<p class="subtitle">Welcome to your content-driven website</p>
+
+			<div class="section">
+				<h2 class="section-title">Recent Chapters</h2>
+
+				{
+					recentChapters.length === 0 ? (
+						<div class="no-chapters">
+							<p>No chapters have been published yet.</p>
+							<p>
+								Start by adding content in the Directus admin
+								panel.
+							</p>
+						</div>
+					) : (
+						<div class="chapter-grid">
+							{recentChapters.map((chapter) => (
+								<div class="chapter-card">
+									<a
+										href={`/chapters/${chapter.slug}`}
+										class="chapter-link"
+									>
+										<div class="chapter-number">
+											Chapter {chapter.order}
+										</div>
+										<h3 class="chapter-title">
+											{chapter.title}
+										</h3>
+									</a>
+								</div>
+							))}
+						</div>
+					)
+				}
+
+				{
+					chapters.length > 0 && (
+						<a href="/chapters" class="cta-button">
+							View All Chapters →
+						</a>
+					)
+				}
+			</div>
+
+			<div class="info-box">
+				<h3>Tech Stack</h3>
+				<p>This site is powered by:</p>
+				<ul>
+					<li>
+						<strong>Astro</strong> - Static site generator for blazing-fast
+						performance
+					</li>
+					<li>
+						<strong>Directus</strong> - Self-hosted headless CMS for
+						content management
+					</li>
+					<li>
+						<strong>PostgreSQL</strong> - Reliable database for content
+						storage
+					</li>
+				</ul>
+				<p>
+					Manage content at: <a
+						href="http://localhost:8055"
+						target="_blank">Directus Admin Panel</a
+					>
+				</p>
+			</div>
+		</div>
+	</body>
+</html>
